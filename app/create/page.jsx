@@ -91,6 +91,19 @@ const AddRecipeForm = () => {
                 <p className="text-sm text-red-500">{errors.title?.message}</p>
               )}
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="youtubeLink">Youtube Link</Label>
+              <Input
+                id="youtubeLink"
+                {...register("youtubeLink")}
+                className={errors.youtubeLink ? "border-red-500" : ""}
+              />
+              {errors.youtubeLink && (
+                <p className="text-sm text-red-500">
+                  {errors.youtubeLink?.message}
+                </p>
+              )}
+            </div>
 
             {/* Ingredients */}
             <div className="space-y-4">

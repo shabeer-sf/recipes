@@ -33,7 +33,6 @@ export async function createRecipe(data) {
   }
 }
 
-
 export async function getRecipes({
   page = 1,
   limit = 15,
@@ -108,14 +107,12 @@ export async function createMeasurement(data) {
 
 export async function getMeasurement() {
   try {
-
-
     // Fetch recipes with pagination and search filter
     const measurements = await db.measurement.findMany();
 
     // Get total count for pagination calculation
 
-    return measurements
+    return measurements;
   } catch (error) {
     console.error("Error fetching measurement:", error);
     throw new Error("Failed to fetch measurement.");
@@ -152,4 +149,24 @@ export async function getRecipeById(id) {
     console.error("Error fetching recipe:", error);
     throw new Error("Failed to fetch the recipe. Please try again.");
   }
+}
+
+export async function deleteRecipeById(id) {
+  console.log("id",id)
+    if (!id) {
+      throw new Error("Recipe ID is required");
+    }
+
+    // Delete the recipe by its unique ID
+    const deletedRecipe = await db.recipe.delete({
+      where: {
+        id: id, // Specify the recipe ID to delete
+      },
+    });
+
+    return {
+      success: true,
+      deletedRecipe,
+    };
+ 
 }

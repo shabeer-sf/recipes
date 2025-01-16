@@ -17,19 +17,20 @@ model Recipe {
   id          String          @id @default(cuid())
   title       String
   description String?
+  youtubeLink String?
   tips        String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  ingredients Ingredient[]
+  ingredients Ingredient[]    
 }
 
 model Ingredient {
   id           String       @id @default(cuid())
   name         String       // Ingredient name
   quantity     Float        // Quantity of the ingredient
-  measurement  Measurement  @relation(fields: [measurementId], references: [id])
+ measurement  Measurement  @relation(fields: [measurementId], references: [id], onDelete: Cascade)
   measurementId String
-  recipe       Recipe       @relation(fields: [recipeId], references: [id])
+  recipe       Recipe       @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   recipeId     String
 }
 

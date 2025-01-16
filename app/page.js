@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -29,7 +29,9 @@ import {
 } from "@/components/ui/pagination";
 import { format } from "date-fns";
 import Link from "next/link";
-import { getRecipes } from "@/actions/recipe";
+import { deleteRecipeById, getRecipes } from "@/actions/recipe";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const VideoListing = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,7 +40,7 @@ const VideoListing = () => {
   const [videos, setVideos] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const itemsPerPage = 15;
 
   const fetchVideos = async () => {
@@ -74,6 +76,23 @@ const VideoListing = () => {
     );
   };
 
+  const deletDataById = async (id) => {
+    // console.log("",id)
+
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this recipe?"
+    );
+
+    if (!isConfirmed) {
+      return; // Exit the function if the user cancels
+    }
+
+    const deleteData = await deleteRecipeById(id);
+    if (deleteData.success) {
+      toast.success("Recipe deleted successfully");
+      router.refresh();
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
@@ -109,18 +128,32 @@ const VideoListing = () => {
         </div>
 
         {/* Video Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
-            <p>Loading recipes...</p>
+            <div className="flex items-center w-full  justify-center h-screen bg-gray-100">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            </div>
           ) : (
-            videos.map((video) => (
-              <Link key={video.id} className="w-full" href={`recipes/${video.id}`}>
-              <Card  className="w-full">
-                <CardHeader>
-                  <CardTitle>{video.title}</CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">
-                    Posted on {format(new Date(video.createdAt), "dd-LLL-yyyy")}
-                  </CardDescription>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {videos.map((video) => (
+              <Card key={video.id} className="w-full">
+                <CardHeader >
+                  <div className="flex items-start">
+                    <div className="w-full">
+                      <Link className="w-full" href={`recipes/${video.id}`}>
+                        <CardTitle>{video.title}</CardTitle>
+                        <CardDescription className="text-sm text-muted-foreground">
+                          Posted on{" "}
+                          {format(new Date(video.createdAt), "dd-LLL-yyyy")}
+                        </CardDescription>
+                      </Link>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => deletDataById(video.id)}
+                    >
+                      <Trash2 color="red" />
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -141,10 +174,9 @@ const VideoListing = () => {
                   </div>
                 </CardContent>
               </Card>
-              </Link>
-            ))
-          )}
+            ))}
         </div>
+          )}
 
         {/* Pagination */}
         <Pagination className="mt-6">
