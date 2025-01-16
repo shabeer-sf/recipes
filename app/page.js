@@ -48,12 +48,13 @@ const VideoListing = () => {
         search: searchQuery,
         page: currentPage,
         limit: itemsPerPage,
-        sort:sortBy
+        sort: sortBy,
       });
+      console.log(response, response.recipes);
       setVideos(response.recipes);
       setTotalPages(response.totalPages);
     } catch (error) {
-      console.error("Failed to fetch videos:", error);
+      console.error("Failed to fetch recipes:", error);
     } finally {
       setLoading(false);
     }
@@ -61,7 +62,7 @@ const VideoListing = () => {
 
   useEffect(() => {
     fetchVideos();
-  }, [searchQuery, currentPage,sortBy]);
+  }, [searchQuery, currentPage, sortBy]);
 
   const toggleDescription = (id) => {
     setVideos((prevVideos) =>
@@ -73,12 +74,6 @@ const VideoListing = () => {
     );
   };
 
-  const getVideoId = (url) => {
-    const regex =
-      /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
-  };
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
@@ -88,7 +83,7 @@ const VideoListing = () => {
           <div className="relative w-full">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search videos..."
+              placeholder="Search recipes..."
               className="pl-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -102,11 +97,13 @@ const VideoListing = () => {
               <SelectContent>
                 <SelectItem value="latest">Latest</SelectItem>
                 <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
               </SelectContent>
             </Select>
             <Link href={"/create"}>
               <Button className="bg-blue-500">Create</Button>
+            </Link>
+            <Link href={"/measurement"}>
+              <Button className="bg-blue-500">Create Measurement</Button>
             </Link>
           </div>
         </div>
@@ -114,10 +111,11 @@ const VideoListing = () => {
         {/* Video Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
-            <p>Loading videos...</p>
+            <p>Loading recipes...</p>
           ) : (
             videos.map((video) => (
-              <Card key={video.id} className="w-full">
+              <Link key={video.id} className="w-full" href={`recipes/${video.id}`}>
+              <Card  className="w-full">
                 <CardHeader>
                   <CardTitle>{video.title}</CardTitle>
                   <CardDescription className="text-sm text-muted-foreground">
@@ -125,16 +123,6 @@ const VideoListing = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="aspect-video w-full">
-                    <iframe
-                      className="w-full h-full rounded-md shadow-md"
-                      src={`https://www.youtube.com/embed/${getVideoId(
-                        video.youtubeLink
-                      )}`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
                   <div>
                     <p
                       className={`text-sm ${
@@ -153,6 +141,7 @@ const VideoListing = () => {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))
           )}
         </div>
